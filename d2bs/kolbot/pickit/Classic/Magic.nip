@@ -1,0 +1,12 @@
+[Type] == Ring && [Quality] == Magic # [ItemMagicBonus] >= 40
+[Type] == Amulet && [Quality] == Magic # [ItemMagicBonus] >= 50
+
+[Type] == Scepter && [Quality] == Magic # [PaladinSkills]+[SkillBlessedHammer] >= 5 && ([SkillConcentration] >= 3 || ([FCR] >= 10 && [SkillConcentration] >= 2))
+[Type] == Staff && [Quality] == Magic # [SorceressSkills] >= 2 && [FCR] >= 20 && ([SkillEnchant] >= 3 || [SkillLightning] >= 3 || [SkillBlizzard] >= 3 || [SkillFireball] >= 3)
+[Type] == Wand && [Quality] == Magic # [NecromancerSkills] >= 2 && [FCR] >= 20 && [SkillBoneSpear] >= 3
+
+([Name] == GrimHelm || [Name] == DeathMask || [Name] == WingedHelm || [Name] == GrandCrown) && [Quality] == Magic # [MaxHP] >= 40 && ([EnhancedDefense] >= 99 || [ColdResist] >= 30 || [LightResist] >= 30 || [FireResist] >= 26)
+[Type] == Helm && [Name] != Basinet && [Name] != GrandCrown && [Name] != WingedHelm && [Quality] == Magic # [MaxHP] >= 40 && ([ColdResist] >= 30 || [LightResist] >= 30 || [FireResist] >= 30)
+
+[Type] == Shield && [Quality] == Magic # [FBR] == 30 && [fireresist]+[coldresist]+[lightresist] >= 60
+([Name] == GrimShield || [Name] == Pavise || [Name] == AncientShield) && [Quality] == Magic # [FBR] == 30 && [EnhancedDefense] >= 100 

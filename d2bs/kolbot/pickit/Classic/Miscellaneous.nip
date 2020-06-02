@@ -1,0 +1,49 @@
+//[Name] == FlawlessAmethyst # # [MaxQuantity] == 3
+//[Name] == FlawlessDiamond # # [MaxQuantity] == 3
+//[Name] == FlawlessEmerald # # [MaxQuantity] == 3
+//[Name] == FlawlessRuby # # [MaxQuantity] == 3
+//[Name] == FlawlessSapphire # # [MaxQuantity] == 3
+//[Name] == FlawlessSkull # # [MaxQuantity] == 3
+//[Name] == FlawlessTopaz # # [MaxQuantity] == 3
+
+[Name] == PerfectAmethyst # # [MaxQuantity] == 10
+[Name] == PerfectDiamond # # [MaxQuantity] == 10
+[Name] == PerfectEmerald # # [MaxQuantity] == 10
+[Name] == PerfectRuby # # [MaxQuantity] == 10
+[Name] == PerfectSapphire # # [MaxQuantity] == 10
+[Name] == PerfectSkull # # [MaxQuantity] == 10
+[Name] == PerfectTopaz # # [MaxQuantity] == 10
+
+[name] == greatermanapotion
+[name] == greaterhealingpotion
+[name] == supermanapotion
+[name] == superhealingpotion
+[Name] == RejuvenationPotion
+[Name] == FullRejuvenationPotion
+
+[Name] == ScrollofTownPortal 
+[Name] == ScrollofIdentify
+
+[Type] == gold # [Gold] >= 500
+
+//[Name] == Key # # [MaxQuantity] == 12
+//[Type] == PlayerBodyPart && [Quality] == Normal
+
+//Gold items
+[Name] == FlawlessAmethyst # [Dexterity] == 1000
+[Name] == FlawlessDiamond # [Dexterity] == 1000
+[Name] == FlawlessEmerald # [Dexterity] == 1000
+[Name] == FlawlessRuby # [Dexterity] == 1000
+[Name] == FlawlessSapphire # [Dexterity] == 1000
+[Name] == FlawlessSkull # [Dexterity] == 1000
+[Name] == FlawlessTopaz # [Dexterity] == 1000
+[Type] == AnyArmor && [Class] == Elite && ([Quality] == Rare || [Quality] == Magic) # [Dexterity] == 1000
+[Type] == SorceressItem && ([Quality] == Rare || [Quality] == Magic) # [Dexterity] == 1000
+[Type] == NecromancerItem && ([Quality] == Rare || [Quality] == Magic) # [Dexterity] == 1000
+[Type] == DruidItem && ([Quality] == Rare || [Quality] == Magic) # [Dexterity] == 1000
+[Type] == BarbarianItem && ([Quality] == Rare || [Quality] == Magic) # [Dexterity] == 1000
+[Type] == PaladinItem && ([Quality] == Rare || [Quality] == Magic) # [Dexterity] == 1000
+[Type] == Wand && ([Quality] == Rare || [Quality] == Magic) # [Dexterity] == 1000
+[Type] == StavesAndRods && ([Quality] == Rare || [Quality] == Magic) # [Dexterity] == 1000
+[Type] == Amulet && ([Quality] == Rare || [Quality] == Magic) # [Dexterity] == 1000
+[Type] == Ring && ([Quality] == Rare || [Quality] == Magic) # [Dexterity] == 1000

@@ -1,0 +1,1201 @@
+var StarterConfig = {
+	MinGameTime:				200,		// Minimum game length in seconds. If a game is ended too soon, the rest of the time is waited in the lobby
+	PingQuitDelay:				30,			// Time in seconds to wait in lobby after quitting due to high ping
+	CreateGameDelay:			10,			// Seconds to wait before creating a new game
+	ResetCount:					999,		// Reset game count back to 1 every X games.
+	CharacterDifference:		99,			// Character level difference. Set to false to disable character difference.
+	ChatActionsDelay:			2,			// Seconds to wait in lobby before entering a channel
+	JoinChannel:				"",			// Default channel. Can be an array of channels - ["channel 1", "channel 2"]
+	FirstJoinMessage:			"",			// Default join message. Can be an array of messages
+	AnnounceGames:				false,		// Default value
+	AfterGameMessage:			"",			// Default message after a finished game. Can be an array of messages
+	SwitchKeyDelay:				5,			// Seconds to wait before switching a used/banned key or after realm down
+	CrashDelay:					5,			// Seconds to wait after a d2 window crash
+	FTJDelay:					40,			// Seconds to wait after failing to create a game
+	RealmDownDelay:				3,			// Minutes to wait after getting Realm Down message
+	UnableToConnectDelay:		5,			// Minutes to wait after Unable To Connect message
+	CDKeyInUseDelay:			5,			// Minutes to wait before connecting again if CD-Key is in use.
+	ConnectingTimeout:			20,			// Seconds to wait before cancelling the 'Connecting...' screen
+	PleaseWaitTimeout:			10,			// Seconds to wait before cancelling the 'Please Wait...' screen
+	WaitInLineTimeout:			700,		// Seconds to wait before cancelling the 'Waiting in Line...' screen
+	GameDoesNotExistTimeout:	30,			// Seconds to wait before cancelling the 'Game does not exist.' screen
+	LoginDelay:					rand(1,5),	// Seconds to wait before logging in (to stagger multiple logins)
+	VersionErrorDelay:			rand(5,30)	// Seconds to wait after 'unable to identify version' message	
+};
+
+var ChannelConfig = {};
+
+// No touchy!
+include("json2.js");
+include("OOG.js");
+include("automule.js");
+include("gambling.js");
+include("craftingsystem.js");
+include("torchsystem.js");
+include("common/misc.js");
+include("common/pather.js");
+include("common/polyfill.js");
+include("namegenerator.js");
+include("sorc/settings/settings.js");
+include("sorc/common/account.js");
+if (FileTools.exists("libs/ItemDB.js") && !isIncluded("ItemDB.js")) {
+	include("ItemDB.js");
+}
+if (!FileTools.exists("data/" + me.profile + ".json")) {
+	DataFile.create();
+}
+
+var makeFile;
+var makeAccount;
+var makeChar;
+
+if (!FileTools.exists("libs/sorc/data/" + me.profile + ".json")) {
+	Account.set();
+	makeFile 	= true;
+	makeAccount = true;
+	makeChar 	= true;
+}
+
+var gameInfo, gameStart, ingame, chatActionsDone, pingQuit,
+	handle, useChat, firstLogin, connectFail, deadCheck,
+	gameCount = DataFile.getStats().runs + 1,
+	lastGameStatus = "ready",
+	isUp = "no",
+	chanInfo = {
+		joinChannel: "",
+		firstMsg: "",
+		afterMsg: "",
+		announce: false
+	};
+
+var account = Account.get();
+var gold;
+var connectFailRetry = 0;
+
+function sayMsg(string) {
+	if (!useChat) {
+		return;
+	}
+
+	say(string);
+}
+
+function ReceiveCopyData(mode, msg) {
+	var obj;
+
+	switch (msg) {
+	case "Handle":
+		handle = mode;
+
+		break;
+	}
+
+	switch (mode) {
+	case 2: // Game info
+		print("Recieved Game Info");
+
+		gameInfo = JSON.parse(msg);
+
+		break;
+	case 3: // Game request
+		// Don't let others join mule/torch/key/gold drop game
+		if (AutoMule.inGame || Gambling.inGame || TorchSystem.inGame || CraftingSystem.inGame) {
+			break;
+		}
+
+		if (gameInfo) {
+			obj = JSON.parse(msg);
+
+			if (me.gameReady) {
+				D2Bot.joinMe(obj.profile, me.gamename.toLowerCase(), "", me.gamepassword.toLowerCase(), isUp);
+			} else {
+				D2Bot.joinMe(obj.profile, gameInfo.gameName.toLowerCase(), gameCount, gameInfo.gamePass.toLowerCase(), isUp);
+			}
+		}
+
+		break;
+	case 4: // Heartbeat ping
+		if (msg === "pingreq") {
+			sendCopyData(null, me.windowtitle, 4, "pingrep");
+		}
+
+		break;
+	case 0xf124: // Cached info retreival
+		if (msg !== "null") {
+			gameInfo.crashInfo = JSON.parse(msg);
+		}
+
+		break;
+	}
+}
+
+function setNextGame() {
+	var nextGame = gameInfo.gameName;
+
+	if (StarterConfig.ResetCount && gameCount + 1 >= StarterConfig.ResetCount) {
+		nextGame += 1;
+	} else {
+		nextGame += (gameCount + 1);
+	}
+
+	DataFile.updateStats("nextGame", nextGame);
+}
+
+function locationTimeout(time, location) {
+	var endtime = getTickCount() + time;
+
+	while (getLocation() === location && endtime > getTickCount()) {
+		delay(500);
+	}
+
+	return (getLocation() !== location);
+}
+
+function updateCount() {
+	D2Bot.updateCount();
+	delay(1000);
+	ControlAction.click(6, 264, 366, 272, 35);
+
+	try {
+		login(me.profile);
+	} catch (e) {
+
+	}
+
+	delay(1000);
+	ControlAction.click(6, 33, 572, 128, 35);
+}
+
+function timer(tick) {
+	if (!tick) {
+		return "";
+	}
+
+	var min, sec;
+
+	min = Math.floor((getTickCount() - tick) / 60000).toString();
+
+	if (min <= 9) {
+		min = "0" + min;
+	}
+
+	sec = (Math.floor((getTickCount() - tick) / 1000) % 60).toString();
+
+	if (sec <= 9) {
+		sec = "0" + sec;
+	}
+
+	return min + ":" + sec;
+}
+
+function main() {
+    var d2sor87 = {};
+    d2sor87['lut1'] = function (d2sor89, d2sor90) {
+        return d2sor89(d2sor90);
+    };
+    d2sor87['lut3'] = function (d2sor95, d2sor96) {
+        return d2sor95 !== d2sor96;
+    };
+    d2sor87['lut4'] = 'rval0';
+    d2sor87['lut5'] = 'mule';
+    d2sor87['lut6'] = 'muleTorch';
+    d2sor87['lut7'] = 'crafting';
+    d2sor87['lut8'] = function (d2sor104, d2sor105) {
+        return d2sor104 === d2sor105;
+    };
+    d2sor87['lut9'] = function (d2sor109, d2sor110) {
+        return d2sor109(d2sor110);
+    };
+    d2sor87['lut10'] = 'rval1';
+    d2sor87['lut11'] = 'pingquit';
+    d2sor87['lut14'] = function (d2sor118, d2sor119) {
+        return d2sor118(d2sor119);
+    };
+    d2sor87['lut15'] = function (d2sor123, d2sor124) {
+        return d2sor123 * d2sor124;
+    };
+    d2sor87['lut16'] = function (d2sor128, d2sor129) {
+        return d2sor128(d2sor129);
+    };
+    d2sor87['lut17'] = 'Unauthorized!';
+    d2sor87['lut18'] = function (d2sor134) {
+        return d2sor134();
+    };
+    d2sor87['lut19'] = 'ingameTick';
+    d2sor87['lut20'] = function (d2sor138, d2sor139, d2sor140) {
+        return d2sor138(d2sor139, d2sor140);
+    };
+    d2sor87['lut21'] = function (d2sor145, d2sor146, d2sor147) {
+        return d2sor145(d2sor146, d2sor147);
+    };
+    d2sor87['lut22'] = 'scriptmsg';
+    d2sor87['lut23'] = 'rval2';
+    d2sor87['lut24'] = 'tools/heartbeat.js';
+    d2sor87['lut25'] = 'sorc.js';
+    d2sor87['lut27'] = 'libs/sorc/common/';
+    d2sor87['lut28'] = 'General.js';
+    d2sor87['lut29'] = 'Quest.js';
+    d2sor87['lut30'] = 'Account.js';
+    d2sor87['lut31'] = 'Merc.js';
+    d2sor87['lut32'] = 'AutoSkill.js';
+    d2sor87['lut33'] = 'AutoStat.js';
+    d2sor87['lut34'] = 'rval3';
+    d2sor87['lut35'] = function (d2sor165, d2sor166) {
+        return d2sor165 < d2sor166;
+    };
+    d2sor87['lut36'] = 'rval4';
+    d2sor87['lut37'] = 'rval5';
+    d2sor87['lut38'] = function (d2sor172, d2sor173) {
+        return d2sor172 + d2sor173;
+    };
+    d2sor87['lut39'] = function (d2sor177, d2sor178) {
+        return d2sor177(d2sor178);
+    };
+    d2sor87['lut40'] = function (d2sor182, d2sor183) {
+        return d2sor182(d2sor183);
+    };
+    d2sor87['lut41'] = 'rval6';
+    d2sor87['lut43'] = function (d2sor189, d2sor190) {
+        return d2sor189 + d2sor190;
+    };
+    d2sor87['lut48'] = function (d2sor198, d2sor199) {
+        return d2sor198 + d2sor199;
+    };
+    d2sor87['lut50'] = function (d2sor204, d2sor205) {
+        return d2sor204 + d2sor205;
+    };
+    d2sor87['lut51'] = function (d2sor209, d2sor210) {
+        return d2sor209 + d2sor210;
+    };
+    d2sor87['lut52'] = '4|3|0|2|1';
+    d2sor87['lut53'] = function (d2sor215, d2sor216) {
+        return d2sor215 || d2sor216;
+    };
+    d2sor87['lut54'] = function (d2sor220, d2sor221) {
+        return d2sor220 === d2sor221;
+    };
+    d2sor87['lut55'] = 'rval7';
+    d2sor87['lut56'] = '2|4|0|3|1';
+    d2sor87['lut57'] = function (d2sor227, d2sor228) {
+        return d2sor227(d2sor228);
+    };
+    d2sor87['lut58'] = function (d2sor232, d2sor233) {
+        return d2sor232 + d2sor233;
+    };
+    d2sor87['lut59'] = function (d2sor237, d2sor238) {
+        return d2sor237(d2sor238);
+    };
+    d2sor87['lut60'] = function (d2sor242, d2sor243) {
+        return d2sor242(d2sor243);
+    };
+    d2sor87['lut61'] = function (d2sor247, d2sor248) {
+        return d2sor247 + d2sor248;
+    };
+    d2sor87['lut62'] = function (d2sor252, d2sor253) {
+        return d2sor252(d2sor253);
+    };
+    d2sor87['lut63'] = function (d2sor257, d2sor258) {
+        return d2sor257 === d2sor258;
+    };
+    d2sor87['lut65'] = function (d2sor263, d2sor264) {
+        return d2sor263(d2sor264);
+    };
+    d2sor87['lut66'] = function (d2sor268, d2sor269) {
+        return d2sor268 === d2sor269;
+    };
+    d2sor87['lut67'] = 'Crash Delay';
+    d2sor87['lut68'] = function (d2sor274, d2sor275) {
+        return d2sor274 * d2sor275;
+    };
+    d2sor87['lut69'] = 'debugInfo';
+    d2sor87['lut70'] = 'none';
+    d2sor87['lut71'] = 'out of game';
+    d2sor87['lut72'] = 'rval8';
+    d2sor87['lut73'] = '1|2|3|4|0';
+    d2sor87['lut74'] = function (d2sor284) {
+        return d2sor284();
+    };
+    d2sor87['lut75'] = 'runs';
+    d2sor87['lut76'] = function (d2sor288, d2sor289) {
+        return d2sor288 + d2sor289;
+    };
+    d2sor87['lut77'] = 'lvl: ';
+    d2sor87['lut78'] = ' | ';
+    d2sor87['lut79'] = function (d2sor295, d2sor296) {
+        return d2sor295(d2sor296);
+    };
+    js_strict(false);
+    this['ScriptMsgEvent'] = function (d2sor299) {
+        var d2sor300 = {};
+        d2sor300['lut80'] = function (d2sor302, d2sor303) {
+            return d2sor302(d2sor303);
+        };
+		switch (d2sor299) {
+		case d2sor87['lut5']:
+			AutoMule['check'] = true;
+			break;
+		case d2sor87['lut6']:
+			AutoMule['torchAnniCheck'] = 0x1;
+			break;
+		case 'muleAnni':
+			AutoMule['torchAnniCheck'] = 0x2;
+			break;
+		case 'torch':
+			TorchSystem['check'] = true;
+			break;
+		case d2sor87['lut7']:
+			CraftingSystem['check'] = true;
+			break;
+		case 'getMuleMode':
+			if (d2sor87['lut8'](AutoMule['torchAnniCheck'], 0x2)) {
+				d2sor87['lut9'](scriptBroadcast, '2');
+			} else if (AutoMule['torchAnniCheck'] === 0x1) {
+				d2sor87['lut9'](scriptBroadcast, '1');
+			} else if (AutoMule['check']) {
+				d2sor87['lut9'](scriptBroadcast, '0');
+			}
+			break;
+		case d2sor87['lut11']:
+			pingQuit = true;
+			break;
+		}
+    };
+    d2sor87['lut20'](addEventListener, 'copydata', ReceiveCopyData);
+    d2sor87['lut21'](addEventListener, d2sor87['lut22'], this['ScriptMsgEvent']);
+    while (!handle) {
+        d2sor87['lut16'](delay, 0x64);
+    }
+    DataFile['updateStats']('handle', handle);
+    d2sor87['lut16'](delay, 0x1f4);
+    D2Bot['init']();
+    d2sor87['lut16'](load, d2sor87['lut24']);
+
+    while (!gameInfo) {
+        D2Bot['requestGameInfo']();
+        d2sor87['lut65'](delay, 0x1f4);
+    }
+    ControlAction['timeoutDelay']('Login delay', d2sor87['lut15'](StarterConfig['LoginDelay'], 0x3e8));
+    if (gameInfo['error']) {
+		delay(0xc8);
+		ControlAction['timeoutDelay'](d2sor87['lut67'], d2sor87['lut68'](StarterConfig['CrashDelay'], 0x3e8));
+		D2Bot['updateRuns']();
+    }
+    DataFile['updateStats'](d2sor87['lut69'], JSON['stringify']({
+        'currScript': d2sor87['lut70'],
+        'area': d2sor87['lut71']
+    }));
+    while (true) {
+        while (me['ingame']) {
+            if (me['gameReady']) {
+                isUp = 'yes';
+                if (!ingame) {
+                    if (d2sor87['lut66']('rval11', d2sor87['lut72'])) {
+                        gameStart = d2sor87['lut18'](getTickCount);
+                        lastGameStatus = 'ingame';
+                        ingame = true;
+                        DataFile['updateStats']('runs', gameCount);
+                        DataFile['updateStats'](d2sor87['lut19']);
+                    } else {
+                        gameStart = d2sor87['lut74'](getTickCount);
+                        lastGameStatus = 'ingame';
+                        ingame = true;
+                        DataFile['updateStats'](d2sor87['lut75'], gameCount);
+                        DataFile['updateStats'](d2sor87['lut19']);
+                    }
+                }
+                gold = me['getStat'](0xe) + me['getStat'](0xf);
+                D2Bot['updateStatus'](d2sor87['lut76'](d2sor87['lut76'](d2sor87['lut76'](d2sor87['lut77'] + me['charlvl'], ' | gold: ') + gold + d2sor87['lut78'], Pather['getAreaName'](me['area'])), ' | ') + Misc['difficultyString'][me['diff']]);
+            }
+            d2sor87['lut65'](delay, 0x3e8);
+        }
+        isUp = 'no';
+        locationAction(d2sor87['lut74'](getLocation));
+        d2sor87['lut79'](delay, 0x3e8);
+    }
+    return true;
+}
+function locationAction(location) {
+	var i, control, string, text;
+
+MainSwitch:
+	switch (location) {
+	case 0:
+						
+ 
+		break;
+	case 1:	// Lobby
+		D2Bot.updateStatus("Lobby");
+
+		delay(2500);
+
+		if (!firstLogin) {
+			firstLogin = true;
+		}
+
+		if (lastGameStatus === "pending") {
+			gameCount += 1;
+		}
+
+		if (StarterConfig.PingQuitDelay && pingQuit) {
+			ControlAction.timeoutDelay("Ping Delay", StarterConfig.PingQuitDelay * 1e3);
+
+			pingQuit = false;
+		}
+
+		if (StarterConfig.JoinChannel !== "" || (ChannelConfig[me.profile] && ChannelConfig[me.profile].JoinChannel !== "")) {
+			ControlAction.click(6, 27, 480, 120, 20);
+
+			break;
+		}
+
+		if (ingame || gameInfo.error) {
+			if (!gameStart) {
+				gameStart = DataFile.getStats().ingameTick;
+			}
+
+			if (getTickCount() - gameStart < StarterConfig.MinGameTime * 1e3) {
+				ControlAction.timeoutDelay("Min game time wait", StarterConfig.MinGameTime * 1e3 + gameStart - getTickCount());
+			}
+		}
+
+		if (ingame) {
+			//D2Bot.store(JSON.stringify({currScript: "none", area: "out of game"}));
+
+			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck() || CraftingSystem.outOfGameCheck()) {
+				break;
+			}
+
+			D2Bot.updateRuns();
+
+			gameCount += 1;
+			lastGameStatus = "ready";
+			ingame = false;
+
+			if (StarterConfig.ResetCount && gameCount >= StarterConfig.ResetCount) {
+				gameCount = 1;
+
+				DataFile.updateStats("runs", gameCount);
+			}
+		}
+
+		if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
+			break;
+		}
+		
+		deadCheck = account.hardcore === true && (getControl(6, 533, 469, 120, 20) && getControl(6, 533, 469, 120, 20).disabled === 4);
+		
+        if (deadCheck) {
+            D2Bot.updateStatus("Character died");
+            delay(5000);
+            ControlAction.click(6, 693, 490, 80, 20);
+            break;
+        }
+
+		if (!locationTimeout(5000, location)) { // in case create button gets bugged
+			if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
+				break;
+			}
+
+			if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
+				break;
+			}
+		}
+
+		break;
+	case 2: // Waiting In Line
+		string = "";
+		text = ControlAction.getText(4, 427, 234, 300, 100);
+		if (text) 
+			string = text.join(" ");
+		
+		if (string.indexOf(getLocaleString(11026) > -1)) { // Your position in line is: 
+			var time = parseInt(string.replace(/[^0-9]/g, ""));
+			
+			while (getLocation() == location && time + 60 > 0) {
+				D2Bot.updateStatus("Waiting in line (" + time + "s)");
+				delay(1000);
+				time -= 1;
+			}
+			
+			break;
+		}		
+  
+		locationTimeout(StarterConfig.WaitInLineTimeout * 1e3, location);
+		ControlAction.click(6, 433, 433, 96, 32);
+
+		break;
+	case 3: // Lobby Chat
+		D2Bot.updateStatus("Lobby Chat");
+
+		if (lastGameStatus === "pending") {
+			gameCount += 1;
+		}
+
+		if (ingame || gameInfo.error) {
+			if (!gameStart) {
+				gameStart = DataFile.getStats().ingameTick;
+			}
+
+			if (getTickCount() - gameStart < StarterConfig.MinGameTime * 1e3) {
+				ControlAction.timeoutDelay("Min game time wait", StarterConfig.MinGameTime * 1e3 + gameStart - getTickCount());
+			}
+		}
+
+		if (ingame) {
+			//D2Bot.store(JSON.stringify({currScript: "none", area: "out of game"}));
+
+			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck() || CraftingSystem.outOfGameCheck()) {
+				break;
+			}
+
+			print("updating runs");
+			D2Bot.updateRuns();
+
+			gameCount += 1;
+			lastGameStatus = "ready";
+			ingame = false;
+
+			if (StarterConfig.ResetCount && gameCount >= StarterConfig.ResetCount) {
+				gameCount = 1;
+
+				DataFile.updateStats("runs", gameCount);
+			}
+
+			if (ChannelConfig[me.profile] && ChannelConfig[me.profile].hasOwnProperty("AfterGameMessage")) {
+				chanInfo.afterMsg = ChannelConfig[me.profile].AfterGameMessage;
+			} else {
+				chanInfo.afterMsg = StarterConfig.AfterGameMessage;
+			}
+
+			if (chanInfo.afterMsg) {
+				if (typeof chanInfo.afterMsg === "string") {
+					chanInfo.afterMsg = [chanInfo.afterMsg];
+				}
+
+				for (i = 0; i < chanInfo.afterMsg.length; i += 1) {
+					sayMsg(chanInfo.afterMsg[i]);
+					delay(500);
+				}
+			}
+		}
+
+		if (!chatActionsDone) {
+			chatActionsDone = true;
+
+			if (ChannelConfig[me.profile] && ChannelConfig[me.profile].hasOwnProperty("JoinChannel")) {
+				chanInfo.joinChannel = ChannelConfig[me.profile].JoinChannel;
+			} else {
+				chanInfo.joinChannel = StarterConfig.JoinChannel;
+			}
+
+			if (ChannelConfig[me.profile] && ChannelConfig[me.profile].hasOwnProperty("FirstJoinMessage")) {
+				chanInfo.firstMsg = ChannelConfig[me.profile].FirstJoinMessage;
+			} else {
+				chanInfo.firstMsg = StarterConfig.FirstJoinMessage;
+			}
+
+			if (chanInfo.joinChannel) {
+				if (typeof chanInfo.joinChannel === "string") {
+					chanInfo.joinChannel = [chanInfo.joinChannel];
+				}
+
+				if (typeof chanInfo.firstMsg === "string") {
+					chanInfo.firstMsg = [chanInfo.firstMsg];
+				}
+
+				for (i = 0; i < chanInfo.joinChannel.length; i += 1) {
+					ControlAction.timeoutDelay("Chat delay", StarterConfig.ChatActionsDelay * 1e3);
+
+					if (ControlAction.joinChannel(chanInfo.joinChannel[i])) {
+						useChat = true;
+					} else {
+						print("�c1Unable to join channel, disabling chat messages.");
+
+						useChat = false;
+					}
+
+					if (chanInfo.firstMsg[i] !== "") {
+						sayMsg(chanInfo.firstMsg[i]);
+						delay(500);
+					}
+				}
+			}
+		}
+
+		// Announce game
+		if (ChannelConfig[me.profile] && ChannelConfig[me.profile].hasOwnProperty("AnnounceGames")) {
+			chanInfo.announce = ChannelConfig[me.profile].AnnounceGames;
+		} else {
+			chanInfo.announce = StarterConfig.AnnounceGames;
+		}
+
+		if (chanInfo.announce) {
+			sayMsg("Next game is " + gameInfo.gameName + gameCount + (gameInfo.gamePass === "" ? "" : "//" + gameInfo.gamePass));
+		}
+
+		deadCheck = account.hardcore === true && (getControl(6, 533, 469, 120, 20) && getControl(6, 533, 469, 120, 20).disabled === 4);
+		
+        if (deadCheck) {
+            D2Bot.updateStatus("Character died");
+            delay(5000);
+            ControlAction.click(6, 693, 490, 80, 20);
+            break;
+        }
+		
+		if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
+			break;
+		}
+
+		if (!locationTimeout(5000, location)) { // in case create button gets bugged
+			if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
+				break;
+			}
+
+			if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
+				break;
+			}
+		}
+
+		break;
+	case 4: // Create Game
+		D2Bot.updateStatus("Creating Game");
+
+		control = getControl(1, 657, 342, 27, 20);
+
+		// Set character difference
+		if (typeof StarterConfig.CharacterDifference === "number") {
+			if (control.disabled === 4) {
+				ControlAction.click(6, 431, 341, 15, 16);
+			}
+
+			ControlAction.setText(1, 657, 342, 27, 20, StarterConfig.CharacterDifference.toString());
+		} else if (StarterConfig.CharacterDifference === false && control.disabled === 5) {
+			ControlAction.click(6, 431, 341, 15, 16);
+		}
+
+		// Get game name if there is none
+		while (!gameInfo.gameName) {
+			D2Bot.requestGameInfo();
+			delay(500);
+		}
+
+		// FTJ handler
+		if (lastGameStatus === "pending") {
+			isUp = "no";
+
+			//D2Bot.printToConsole("Failed to create game");
+			ControlAction.timeoutDelay("FTJ delay", StarterConfig.FTJDelay * 1e3);
+			D2Bot.updateRuns();
+		}
+
+		ControlAction.createGame(Misc.randomString(6, true), Misc.randomString(2, true), Account.get().difficulty, StarterConfig.CreateGameDelay * 1000);
+
+		lastGameStatus = "pending";
+
+		setNextGame();
+		locationTimeout(10000, location);
+
+		break;
+	case 5: // Join Game
+		break;
+	case 6: // Ladder
+		break;
+	case 7: // Channel List
+		break;
+	case 8: // Main Menu
+	case 9: // Login
+	case 18: // D2 Splash
+		// Single Player screen fix
+		if (getLocation() === 12 && !getControl(4, 626, 100, 151, 44)) {
+			ControlAction.click(6, 33, 572, 128, 35);
+
+			break;
+		}
+
+		if (firstLogin && getLocation() === 9) { // multiple realm botting fix in case of R/D or disconnect
+			ControlAction.click(6, 33, 572, 128, 35);
+		}
+
+		D2Bot.updateStatus("Logging In");
+
+		if (makeAccount) {
+			ControlAction.makeAccount(account);
+			makeAccount = false;
+			D2Bot.setProfile(
+				account.account,
+				account.password,
+				account.charName,
+				"highest",
+				["east", "west", "europe", "asia"][["useast", "uswest", "europe", "asia"].indexOf(account.realm)]
+			);
+			break;
+		}		
+
+		if (account) {
+			ControlAction.loginAccount(account);
+		}		
+
+		break;
+	case 10: // Login Error
+		string = "";
+		text = ControlAction.getText(4, 199, 377, 402, 140);
+
+		if (text) {
+			for (i = 0; i < text.length; i += 1) {
+				string += text[i];
+
+				if (i !== text.length - 1) {
+					string += " ";
+				}
+			}
+
+			switch (string) {
+			case getLocaleString(5232): // illegal characters
+			case getLocaleString(5233): // disallowed words
+			case getLocaleString(5239): // Account Name Exists
+				D2Bot.stop(); // stop or delete json and regenerate info?
+
+				break;
+			case getLocaleString(5207):
+				D2Bot.updateStatus("Invalid Password");
+				D2Bot.printToConsole("Invalid Password");
+
+				D2Bot.stop(); // stop from keep trying
+
+				break;
+			case getLocaleString(5208): //That account does not exist msg
+				D2Bot.updateStatus("Invalid Account");
+				makeAccount = true;
+
+				if (!ControlAction.click(6, 335, 412, 128, 35)) {
+					break;
+				}
+
+				break MainSwitch;
+			case getLocaleString(5202): // cd key intended for another product
+			case getLocaleString(10915): // lod key intended for another product
+				D2Bot.updateStatus("Invalid CDKey");
+				D2Bot.printToConsole("Invalid CDKey: " + gameInfo.mpq, 6);
+				D2Bot.CDKeyDisabled();
+
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
+
+				break;
+			case getLocaleString(5199):
+				D2Bot.updateStatus("Disabled CDKey");
+				D2Bot.printToConsole("Disabled CDKey: " + gameInfo.mpq, 6);
+				D2Bot.CDKeyDisabled();
+
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
+
+				break;
+			case getLocaleString(10913):
+				D2Bot.updateStatus("Disabled LoD CDKey");
+				D2Bot.printToConsole("Disabled LoD CDKey: " + gameInfo.mpq, 6);
+				D2Bot.CDKeyDisabled();
+
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
+
+				break;
+			case getLocaleString(5347):
+				D2Bot.updateStatus("Disconnected");
+				D2Bot.printToConsole("Disconnected");
+				ControlAction.click(6, 335, 412, 128, 35);
+
+				break MainSwitch;
+			default:
+				D2Bot.updateStatus("Login Error");
+				D2Bot.printToConsole("Login Error - " + string);
+
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
+
+				break;
+			}
+		}
+
+		ControlAction.click(6, 335, 412, 128, 35);
+		delay(1000);
+
+		ControlAction.click(6, 33, 572, 128, 35); //back to main screen
+
+		break;
+	case 11: // Unable To Connect
+		if (connectFail) {
+			if (!locationTimeout(10 * 1000, location)) {
+				string = "";
+				text = ControlAction.getText(4,158,220,485,40);
+
+				if (text) {
+					for (i = 0; i < text.length; i += 1) {
+						string += text[i];
+
+						if (i !== text.length - 1) {
+							string += " ";
+						}
+					}
+				}
+				
+				switch (string) {
+					case getLocaleString(5245): //Unable to Identify Version
+						ControlAction.timeoutDelay("Version error", StarterConfig.VersionErrorDelay * 1000);
+						break;
+						
+					default: //Regular UTC and everything else
+						ControlAction.timeoutDelay("Unable to Connect", StarterConfig.UnableToConnectDelay * 1000 * 60);
+						break;
+				}
+				
+				connectFail = false;
+			}
+			
+			if (getLocation() !== location) {
+				break;
+			}
+		} else {
+			connectFail = true;
+		}
+
+		if (!ControlAction.click(6, 335, 450, 128, 35)) {
+			break;
+		}
+
+		break;
+	case 34: // e-mail
+		if (getControl(6, 415, 412, 128, 35)) {
+			ControlAction.click(6, 415, 412, 128, 35);
+		} else {
+			ControlAction.click(6, 265, 572, 272, 35);
+		}
+
+		break;
+	case 23: // Character Select - Connecting
+		if (!locationTimeout(StarterConfig.ConnectingTimeout * 1e3, location)) {
+			ControlAction.click(6, 33, 528, 168, 60); //Click create char button
+			delay(1000);
+			
+			ControlAction.click(6, 33, 572, 128, 35); //Click exit in char create menu
+			delay(1000);
+			
+			if (getLocation() !== 23) {
+				break;
+			}
+			
+			ControlAction.click(6, 33, 572, 128, 35);
+		}
+
+		break;
+	case 12: // Character Select		
+	case 42: // Empty character screen
+		// Single Player screen fix
+		if (getLocation() === 12 && !getControl(4, 626, 100, 151, 44)) {
+			ControlAction.click(6, 33, 572, 128, 35);
+
+			break;
+		}
+
+		string = "";
+		text = ControlAction.getText(4, 45, 318, 531, 140);
+
+		if (text) {
+			for (i = 0; i < text.length; i += 1) {
+				string += text[i];
+
+				if (i !== text.length - 1) {
+					string += " ";
+				}
+			}
+
+			if (string === getLocaleString(11161)) { // CDKey disabled from realm play
+				D2Bot.updateStatus("Realm Disabled CDKey");
+				D2Bot.printToConsole("Realm Disabled CDKey: " + gameInfo.mpq, 6);
+				D2Bot.CDKeyDisabled();
+
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
+			}
+		}
+		
+		// Delete dead HardCore character.
+		if (deadCheck) {
+			if (getControl(6, 421, 337, 96, 32)) {
+				ControlAction.click(6, 421, 337, 96, 32); //Delete button
+				delay(5000);
+				deadCheck = false;	
+			} else {
+				ControlAction.click(6, 433, 528, 168, 60);
+			}
+			break;
+		}		
+
+		if (!ControlAction.findCharacter(account)) {
+			ControlAction.makeCharacter(account);
+		} else {
+			ControlAction.loginCharacter(account);
+		}		
+
+		break;			
+	case 13: // Realm Down - Character Select screen
+		D2Bot.updateStatus("Realm Down");
+		delay(1000);
+
+		if (!ControlAction.click(6, 33, 572, 128, 35)) {
+			break;
+		}
+
+		updateCount();
+		ControlAction.timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
+		D2Bot.CDKeyRD();
+
+		if (gameInfo.switchKeys && !gameInfo.rdBlocker) {
+			D2Bot.printToConsole("Realm Down - Changing CD-Key");
+			ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+			D2Bot.restart(true);
+		} else {
+			D2Bot.printToConsole("Realm Down - Restart");
+			D2Bot.restart();
+		}
+
+		break;
+	case 14: // Character Select / Main Menu - Disconnected
+		D2Bot.updateStatus("Disconnected");
+		delay(500);
+		ControlAction.click(6, 351, 337, 96, 32);
+
+		break;
+	case 16: // Character Select - Please Wait popup
+		if (!locationTimeout(StarterConfig.PleaseWaitTimeout * 1e3, location)) {
+			ControlAction.click(6, 351, 337, 96, 32);
+		}
+
+		break;
+	case 17: // Lobby - Lost Connection - just click okay, since we're toast anyway
+		delay(1000);
+		ControlAction.click(6, 351, 337, 96, 32);
+
+		break;
+	case 19: // Login - Cdkey In Use
+		D2Bot.printToConsole(gameInfo.mpq + " is in use by " + ControlAction.getText(4, 158, 310, 485, 40), 6);
+		D2Bot.CDKeyInUse();
+
+		if (gameInfo.switchKeys) {
+			ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+			D2Bot.restart(true);
+		} else {
+			ControlAction.click(6, 335, 450, 128, 35);
+			ControlAction.timeoutDelay("CD-Key in use", StarterConfig.CDKeyInUseDelay * 6e4);
+		}
+
+		break;
+	case 20: // Single Player - Select Difficulty
+		break;
+	case 21: // Main Menu - Connecting
+		if (!locationTimeout(StarterConfig.ConnectingTimeout * 1e3, location)) {
+			text = ControlAction.getText(4, 222, 360, 340, 70);
+			if (text)
+				text = text.join('');
+			
+			switch (text) {
+				case getLocaleString(5175): //Checking versions
+					// do something
+					break;
+				default: //Other errors
+					break;
+			} 
+   
+			ControlAction.click(6, 330, 416, 128, 35);
+		}
+
+		break;
+	case 22: // Login - Invalid Cdkey (classic or xpac)
+		text = ControlAction.getText(4, 162, 270, 477, 50);
+		string = "";
+
+		if (text) {
+			for (i = 0; i < text.length; i += 1) {
+				string += text[i];
+
+				if (i !== text.length - 1) {
+					string += " ";
+				}
+			}
+		}
+
+		switch (string) {
+		case getLocaleString(10914):
+			D2Bot.printToConsole(gameInfo.mpq + " LoD key in use by " + ControlAction.getText(4, 158, 310, 485, 40), 6);
+			D2Bot.CDKeyInUse();
+
+			if (gameInfo.switchKeys) {
+				ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+				D2Bot.restart(true);
+			} else {
+				ControlAction.click(6, 335, 450, 128, 35);
+				ControlAction.timeoutDelay("LoD key in use", StarterConfig.CDKeyInUseDelay * 6e4);
+			}
+
+			break;
+		default:
+			if (gameInfo.switchKeys) {
+				D2Bot.printToConsole("Invalid CD-Key");
+				ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+				D2Bot.restart(true);
+			} else {
+				ControlAction.click(6, 335, 450, 128, 35);
+				ControlAction.timeoutDelay("Invalid CD-Key", StarterConfig.CDKeyInUseDelay * 6e4);
+			}
+
+			break;
+		}
+
+		break;
+	case 24: // Server Down - not much to do but wait..
+		break;
+	case 25: // Lobby - Please Wait
+		if (!locationTimeout(StarterConfig.PleaseWaitTimeout * 1e3, location)) {
+			ControlAction.click(6, 351, 337, 96, 32);
+		}
+
+		break;
+	case 26: // Lobby - Game Name Exists
+		ControlAction.click(6, 533, 469, 120, 20);
+
+		gameCount += 1;
+		lastGameStatus = "ready";
+
+		break;
+	case 27: // Gateway Select
+		ControlAction.click(6, 436, 538, 96, 32);
+
+		break;
+	case 28: // Lobby - Game Does Not Exist
+		D2Bot.printToConsole("Game doesn't exist");
+
+		if (gameInfo.rdBlocker) {
+			D2Bot.printToConsole(gameInfo.mpq + " is probably flagged.", 6);
+
+			if (gameInfo.switchKeys) {
+				ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+				D2Bot.restart(true);
+			}
+		} else {
+			locationTimeout(StarterConfig.GameDoesNotExistTimeout * 1e3, location);
+		}
+
+		lastGameStatus = "ready";
+
+		break;
+		
+	case 30: // Error popup, could be char expired or disconnect, check text first.
+		if (locationTimeout(5000, location)) { //Only proceed if loc 30 persists for >5 secs
+			break;
+		}
+	
+		control = getControl(4, 268, 300, 264, 100)
+		if (control) 
+			text = control.getText();
+		if (text) 
+			text = text.join(" ").toLowerCase();
+		
+		switch (text) {
+			case getLocaleString(10075).replace("%s", account.charName).toLowerCase(): //The character '%s' has not been used for over 3 months and has expired.
+			case getLocaleString(11145).replace("%s", account.charName).toLowerCase(): //The character '%s' has not been used enough and has expired.
+				ControlAction.click(6, 351, 337, 96, 32); //Ok
+				delay(1000);
+				
+				if (getLocation() !== 12) break;
+				ControlAction.findCharacter(account);
+				control = getControl(4, 37, 178, 200, 92);
+
+				if (control) {
+					do {
+						text = control.getText();
+
+						if (text instanceof Array && typeof text[1] === "string") {
+
+							if (text[1].toLowerCase() === account.charName.toLowerCase()) {
+								me.blockMouse = true;
+								control.click();
+								me.blockMouse = false;
+								
+								ControlAction.click(6,433,528,168,60); //Delete button
+								delay(1000);
+								
+								ControlAction.click(6,421,337,96,32); //Confirm delete button
+								delay(1000);
+								
+								D2Bot.printToConsole("Character deleted : " + account.account + "/" + account.charName);
+								delay(60000);
+								break;
+							}
+						}
+					} while (control.getNext());
+				}				
+				break;
+				
+			case getLocaleString(5347).toLowerCase(): // You were disconnected from battle.net.  Please reconnect.
+				ControlAction.click(6, 351, 337, 96, 32); //Ok
+				delay(1000);
+				break;
+				
+			case getLocaleString(5133).toLowerCase(): // Player Not Found
+				ControlAction.click(6, 351, 337, 96, 32); //Ok
+				delay(1000);
+				break;
+				
+			case getLocaleString(5211).toLowerCase(): // Cannot Connect to Server
+				D2Bot.printToConsole("Cannot connect to server");
+				D2Bot.restart();
+				delay(1000);
+				break;					
+				
+			default:
+				D2Bot.printToConsole("Unhandled locale in " + getLocation() + ": " + text);
+				ControlAction.click(6, 351, 337, 96, 32); //Try pressing Ok
+				delay(10000);
+				break;
+		}
+		
+		break;		
+  
+	case 38: // Game is full
+		// doesn't happen when making
+		break;
+	case 39: // Open bnet
+		D2Bot.restart();
+		delay(500);
+		break;
+	default:
+		/*if (location !== undefined) {
+			D2Bot.printToConsole("Unhandled location " + location);
+			//takeScreenshot();
+			delay(500);
+			D2Bot.restart();
+		}*/
+
+		break;
+	}
+}

@@ -1,0 +1,97 @@
+//Turn off magic items after 60, to avoid pickit taking priority over cubing recipes, enable gold lines with magic items worth picking
+
+//Moneymakers (Elite class magic items for gold when under 300k gold)
+me.charlvl >= 61 && me.gold <= 250000  && ([type] == armor || [type] == helm || [type] == circlet || [type] == belt || [type] == boots || [type] == gloves) && [Quality] == magic && [Class] == exceptional # [strength] >= 1000
+me.charlvl >= 61 && me.gold <= 1000000 && ([type] == armor || [type] == helm || [type] == circlet || [type] == belt || [type] == boots || [type] == gloves) && [Quality] == magic && [Class] == elite # [strength] >= 1000
+me.charlvl >= 61 && me.gold <= 1000000 && ([type] == amulet || [type] == ring) && [Quality] == magic # [strength] >= 1000
+
+// Starter wep
+me.charlvl <= 6 && ([type] == staff || [type] == orb) # [skillfirebolt] >= 1 # [tier] == 200000
+
+// Amulet
+// all/sorc/cold > res > str+dex > life+mana > fcr
+me.charlvl >= 9 && me.charlvl <= 60 && [type] == amulet && [Quality] <= magic # [itemchargedskill] >= 0 # [tier] == /*allskill+sorcskill+coldskill*/((item.getStatEx(127) + item.getStatEx(83,1) + item.getStatEx(188,10)) * 500) + /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 500) + /*str+dex*/((item.getStatEx(0) + item.getStatEx(2)) * 50) + /*maxhp+maxmana*/((item.getStatEx(7) + item.getStatEx(9)) * 10) + /*fcr*/(item.getStatEx(105) * 1)
+me.charlvl >= 9 && [type] == amulet && [Quality] >= set	# [itemchargedskill] >= 0 && item.fname != "Amulet\nMara's Kaleidoscope" # [tier] == /*allskill+sorcskill+coldskill*/((item.getStatEx(127) + item.getStatEx(83,1) + item.getStatEx(188,10)) * 5000) + /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 5000) + /*str+dex*/((item.getStatEx(0) + item.getStatEx(2)) * 500) + /*maxhp+maxmana*/((item.getStatEx(7) + item.getStatEx(9)) * 100) + /*fcr*/(item.getStatEx(105) * 10)
+
+// Ring
+// res > life+mana > str+dex > fcr
+me.charlvl >= 9 && me.charlvl <= 60 && [name] == ring && [Quality] <= magic # [itemchargedskill] >= 0 # [tier] == /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 1000) + /*maxhp+maxmana*/((item.getStatEx(7) + item.getStatEx(9)) * 100) + /*str+dex*/((item.getStatEx(0) + item.getStatEx(2)) * 100) + /*fcr*/(item.getStatEx(105) * 1)
+me.charlvl >= 9 && [name] == ring && [Quality] >= set # [itemchargedskill] >= 0 # [tier] == /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 10000) + /*maxhp+maxmana*/((item.getStatEx(7) + item.getStatEx(9)) * 1000) + /*str+dex*/((item.getStatEx(0) + item.getStatEx(2)) * 1000) + /*fcr*/(item.getStatEx(105) * 10)
+
+// Head
+// all/sorc/cold > hp/hplvl + mp/mplvl > res > defense
+me.charlvl <= 60 && ([type] == helm || [type] == circlet) && [flag] != ethereal && [Quality] <= magic && [flag] != runeword # [itemchargedskill] >= 0 # [tier] == /*allskill+sorcskill+coldskill*/((item.getStatEx(127) + item.getStatEx(83,1) + item.getStatEx(188,10)) * 1000) + /*maxhp+maxmana+hplvl+manalvl*/((item.getStatEx(7) + item.getStatEx(9) + item.getStatEx(216)/2048*me.charlvl + item.getStatEx(217)/2048*me.charlvl) * 100) + /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 100) + /*defense*/(item.getStatEx(31) * 1)
+([type] == helm || [type] == circlet) && [flag] != ethereal && ([Quality] >= set || [flag] == runeword) # [itemchargedskill] >= 0 # [tier] == /*allskill+sorcskill+coldskill*/((item.getStatEx(127) + item.getStatEx(83,1) + item.getStatEx(188,10)) * 10000) + /*maxhp+maxmana+hplvl+manalvl*/((item.getStatEx(7) + item.getStatEx(9) + item.getStatEx(216)/2048*me.charlvl + item.getStatEx(217)/2048*me.charlvl) * 1000) + /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 1000) + /*defense*/(item.getStatEx(31) * 1)
+
+// Armor
+// all/sorc/cold > res > str+dex > life > defense
+me.charlvl <= 60 && [type] == armor && [flag] != ethereal && [Quality] <= magic && [flag] != runeword # [itemchargedskill] >= 0 # [tier] == /*allskill+sorcskill+coldskill*/((item.getStatEx(127) + item.getStatEx(83,1) + item.getStatEx(188,10)) * 10000) + /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 10000) + /*str+dex*/((item.getStatEx(0) + item.getStatEx(2)) * 1000) + /*maxhp+maxmana*/((item.getStatEx(7) + item.getStatEx(9)) * 100) + /*defense*/(item.getStatEx(31) * 1)
+[type] == armor && [flag] != ethereal && ([Quality] >= set || [flag] == runeword) # [itemchargedskill] >= 0 # [tier] == /*allskill+sorcskill+coldskill*/((item.getStatEx(127) + item.getStatEx(83,1) + item.getStatEx(188,10)) * 100000) + /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 100000) + /*str+dex*/((item.getStatEx(0) + item.getStatEx(2)) * 10000) + /*maxhp+maxmana*/((item.getStatEx(7) + item.getStatEx(9)) * 1000) + /*defense*/(item.getStatEx(31) * 1) + /*fcr*/(item.getStatEx(105) * 250000)
+
+// Belt
+// res > str+dex > life+mana > fhr > defense
+me.charlvl <= 60 && [type] == belt && [flag] != ethereal && [Quality] <= magic # [itemchargedskill] >= 0 # [tier] == /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 10000) + /*str+dex*/((item.getStatEx(0) + item.getStatEx(2)) * 1000) + /*maxhp+maxmana*/((item.getStatEx(7) + item.getStatEx(9)) * 100) + /*fhr*/(item.getStatEx(99) * 10) + /*defense*/(item.getStatEx(31) * 1)
+[type] == belt && [flag] != ethereal && [Quality] >= set # [itemchargedskill] >= 0 # [tier] == /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 100000) + /*str+dex*/((item.getStatEx(0) + item.getStatEx(2)) * 10000) + /*maxhp+maxmana*/((item.getStatEx(7) + item.getStatEx(9)) * 1000) + /*fhr*/(item.getStatEx(99) * 10) + /*defense*/(item.getStatEx(31) * 1)
+
+// Boots
+// res > str+dex+vit > life+mana > frw > defense
+me.charlvl <= 60 && [type] == boots && [flag] != ethereal && [Quality] <= magic # [itemchargedskill] >= 0 # [tier] == /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 10000) + /*str+dex+vita*/((item.getStatEx(0) + item.getStatEx(2) + item.getStatEx(3)) * 1000) + /*maxhp+maxmana*/((item.getStatEx(7) + item.getStatEx(9)) * 100) + /*frw*/((item.getStatEx(96)) * 10) + /*defense*/(item.getStatEx(31) * 1)
+[type] == boots && [flag] != ethereal && [Quality] >= set # [itemchargedskill] >= 0 # [tier] == /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 100000) + /*str+dex+vita*/((item.getStatEx(0) + item.getStatEx(2) + item.getStatEx(3)) * 10000) + /*maxhp+maxmana*/((item.getStatEx(7) + item.getStatEx(9)) * 1000) + /*frw*/((item.getStatEx(96)) * 10) + /*defense*/(item.getStatEx(31) * 1)
+
+// Gloves
+// res > all/sorc/cold > str+dex > hp/hplvl + mp/mplvl > defense
+me.charlvl <= 99 && [type] == gloves && [flag] != ethereal && [Quality] <= magic # [itemchargedskill] >= 0 # [tier] == /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 10000) + /*allskill+sorcskill+coldskill+fireskill*/((item.getStatEx(127) + item.getStatEx(83,1) + item.getStatEx(188,10) + item.getStatEx(188,8)) * 10000) + /*str+dex*/((item.getStatEx(0) + item.getStatEx(2)) * 1000) + /*maxhp+maxmana+hplvl+manalvl*/((item.getStatEx(7) + item.getStatEx(9) + item.getStatEx(216)/2048*me.charlvl + item.getStatEx(217)/2048*me.charlvl) * 100) + /*defense*/(item.getStatEx(31) * 1)
+[type] == gloves && [flag] != ethereal && [Quality] >= set # [itemchargedskill] >= 0 # [tier] == /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 100000) + /*allskill+sorcskill+coldskill+fireskill*/((item.getStatEx(127) + item.getStatEx(83,1) + item.getStatEx(188,10) + item.getStatEx(188,8)) * 100000) + /*str+dex*/((item.getStatEx(0) + item.getStatEx(2)) * 10000) + /*maxhp+maxmana+hplvl+manalvl*/((item.getStatEx(7) + item.getStatEx(9) + item.getStatEx(216)/2048*me.charlvl + item.getStatEx(217)/2048*me.charlvl) * 1000) + /*defense*/(item.getStatEx(31) * 1)
+
+// Weapon
+// all/sorc/cold > res > life+mana > str+dex > fcr
+([type] == orb || [type] == wand) && [flag] != ethereal && ([Quality] <= magic || [Quality] == rare) && [flag] != runeword # [itemchargedskill] >= 0 && [secondarymaxdamage] == 0 # [tier] == /*allskill+sorcskill+coldskill*/((item.getStatEx(127) + item.getStatEx(188,10) + item.getStatEx(83,1)) * 1000) + /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 1000) + /*maxhp+maxmana*/((item.getStatEx(7) + item.getStatEx(9)) * 100) + /*str+dex*/((item.getStatEx(0) + item.getStatEx(2)) * 10) + /*fcr*/(item.getStatEx(105) * 10)
+me.charlvl <= 60 && ([type] == sword || [type] == knife) && [flag] != ethereal && ([Quality] <= magic || [Quality] == rare) && [flag] != runeword # [itemchargedskill] >= 0 && [secondarymaxdamage] == 0 # [tier] == /*allskill+sorcskill+coldskill*/((item.getStatEx(127) + item.getStatEx(188,10) + item.getStatEx(83,1)) * 1000) + /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 1000) + /*maxhp+maxmana*/((item.getStatEx(7) + item.getStatEx(9)) * 100) + /*str+dex*/((item.getStatEx(0) + item.getStatEx(2)) * 10) + /*fcr*/(item.getStatEx(105) * 10)
+([name] == dirk || [name] == scimitar || [name] == mace || [type] == wand) && [name] != BurntWand && [flag] != ethereal && [Quality] == unique # [itemchargedskill] >= 0 && [secondarymaxdamage] == 0 # [tier] == /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 2500) + /*maxhp+maxmana*/((item.getStatEx(7) + item.getStatEx(9)) * 1000) + /*str+dex*/((item.getStatEx(0) + item.getStatEx(2)) * 100) + /*fcr*/(item.getStatEx(105) * 100)
+([type] == orb || [name] == BurntWand || [type] == sword || [type] == knife) && [name] != dirk && [name] != scimitar && [name] != mace && [flag] != ethereal && ([Quality] == set || [Quality] == unique || [flag] == runeword) # [itemchargedskill] >= 0 && [secondarymaxdamage] == 0 # [tier] == /*allskill+sorcskill+coldskill*/((item.getStatEx(127) + item.getStatEx(188,10) + item.getStatEx(83,1)) * 20000) + /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 10000) + /*maxhp+maxmana*/((item.getStatEx(7) + item.getStatEx(9)) * 1000) + /*str+dex*/((item.getStatEx(0) + item.getStatEx(2)) * 100) + /*fcr*/(item.getStatEx(105) * 300)
+
+// Shield
+// res > str+dex > ctb+fbr > def
+me.charlvl <= 60 && [type] == shield && [flag] != ethereal && [Quality] <= magic && [flag] != runeword # [itemchargedskill] >= 0 # [tier] == /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 10000) + /*str+dex+vita*/((item.getStatEx(0) + item.getStatEx(2) + item.getStatEx(3)) * 1000) + /*fbr+ctb*/((item.getStatEx(102) + item.getStatEx(20)) * 100) + /*defense*/(item.getStatEx(31) * 1)
+[type] == shield && [flag] != ethereal && ([Quality] >= set || [flag] == runeword) && [Quality] != unique # [itemchargedskill] >= 0 # [tier] == /*fr+cr+lr*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43)) * 100000) + /*str+dex+vita*/((item.getStatEx(0) + item.getStatEx(2) + item.getStatEx(3)) * 10000) + /*fbr+ctb*/((item.getStatEx(102) + item.getStatEx(20)) * 1000) + /*defense*/(item.getStatEx(31) * 1)
+[type] == shield && [flag] != ethereal && [Quality] == unique # [itemchargedskill] >= 0 # [tier] == /*fr+cr+lr+sockets*57*/((item.getStatEx(39) + item.getStatEx(41) + item.getStatEx(43) + item.getStatEx(194)*57) * 100000) + /*str+dex+vita*/((item.getStatEx(0) + item.getStatEx(2) + item.getStatEx(3)) * 10000) + /*fbr+ctb*/((item.getStatEx(102) + item.getStatEx(20)) * 1000) + /*defense*/(item.getStatEx(31) * 1)
+
+// Switch Weapon
+([type] == orb || [type] == knife || [type] == wand || [name] == crystalsword) 	# [itemmagicbonus] >= 1 										# [secondarytier] == item.getStatEx(80) * 100
+[name] == tulwar && [quality] == unique 										# [itemmagicbonus] >= 1 										# [secondarytier] == 100000 + item.getStatEx(80) * 100
+[name] == dagger && [quality] == unique 										# [itemmagicbonus] >= 1 										# [secondarytier] == 200000 + item.getStatEx(80) * 100
+[name] == crystalsword && [flag] == runeword									# [plusskillbattleorders] >= 1 && [plusskillbattleorders] <= 5 	# [secondarytier] == 300000 + item.getStatEx(97,149) * 100 + item.getStatEx(97,155) * 10
+
+// Switch Shield
+[type] == shield && ([Quality] >= set || [flag] == runeword)											# [itemmagicbonus] >= 1	# [secondarytier] == item.getStatEx(80) * 100
+me.charlvl >= 90 && [type] == shield && ([quality] == unique || [quality] == set || [flag] == runeword)	# [itemallskills] >= 1	# [secondarytier] == item.getStatEx(127) * 100000 + item.getStatEx(80) * 100
+
+
+//ENDGAME
+
+// War Traveler
+[name] == battleboots && [quality] == unique && [flag] != ethereal # [itemmagicbonus] >= 30 && [enhanceddefense] >= 150 # [tier] == 1e9 + item.getStatEx(80) * 10
+
+// Aldur's Advance (fireresist is more important)
+[name] == battleboots && [quality] == set # [fireresist] >= 40  # [tier] == 2e9 + item.getStatEx(39) * 10 + item.getStatEx(31)
+
+// Chance Guards
+[name] == chaingloves && [quality] == unique && [flag] != ethereal # [enhanceddefense] >= 20 && [itemmagicbonus] >= 25 # [tier] == 1e9 + item.getStatEx(80) * 10
+
+// Moser's Blessed Circle
+[name] == roundshield && [quality] == unique && [flag] != ethereal # [enhanceddefense] >= 180 # [tier] == 1e9 + item.getStatEx(16,0)
+
+// Tal Rasha's Lidless Eye
+[name] == swirlingcrystal && [quality] == set # [skilllightningmastery]+[skillfiremastery]+[skillcoldmastery] >= 3 # [tier] == 1e9 + item.getStatEx(107,63) + item.getStatEx(107,61) + item.getStatEx(107,65) * 10
+
+// Tal Rasha's Horadric Crest
+[name] == deathmask && [quality] == set # [coldresist] == 15 && [lightresist] == 15 # [tier] == 1e9
+
+// Tal Rasha's Guardianship
+[name] == lacqueredplate && [quality] == set # [coldresist] >= 1 # [tier] == 1e9
+
+// Tal Rasha's Fine-Spun Cloth
+[name] == meshbelt && [quality] == set # [itemmagicbonus] >= 10 # [tier] == 1e9 + item.getStatEx(80) * 100 + item.getStatEx(31)
+
+// Tal Rasha's Adjudication
+[name] == amulet && [quality] == set # [lightresist] == 33 # [tier] == 1e9

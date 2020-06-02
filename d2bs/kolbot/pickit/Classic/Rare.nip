@@ -1,0 +1,42 @@
+//--- Helmets ---
+([Name] == GrimHelm || [Name] == DeathMask || [Name] == WingedHelm || [Name] == GrandCrown) && [Quality] == Rare # ([EnhancedDefense] >= 60) + ([MaxHP] >= 20) + ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 4
+([Name] == GrimHelm || [Name] == DeathMask || [Name] == WingedHelm || [Name] == GrandCrown) && [Quality] == Rare # [EnhancedDefense] >= 60 && [MaxHP] >= 20 && (([EnhancedDefense] >= 90 && [MaxHP] >= 35) || [Energy] >= 6 || [ItemToHitPercent] >= 5 || [coldresist] >= 20 || [fireresist] >= 20 || [lightresist] >= 20)
+[Type] == Helm && [Name] != Basinet && [Name] != GrandCrown && [Name] != WingedHelm && [Quality] == Rare # ([FHR] >= 10) + ([EnhancedDefense] >= 60) + ([MaxHP] >= 20) + ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 4
+[Type] == Helm && [Name] != Basinet && [Name] != GrandCrown && [Name] != WingedHelm && [Quality] == Rare # [FHR] >= 10 && [MaxHP] >= 20 && ([coldresist] >= 20 || [fireresist] >= 20 || [lightresist] >= 20) && ([MaxHP] >= 35 || [EnhancedDefense] >= 90 || [ItemToHitPercent] >= 5)
+[Type] == Helm && [Quality] == Rare # ([FHR] >= 10) + ([EnhancedDefense] >= 90) + ([MaxHP] >= 35) + ([coldresist] >= 28) + ([fireresist] >= 28) + ([lightresist] >= 28) + ([ItemToHitPercent] >= 5) >= 4
+
+//--- Gloves ---
+[Type] == Gloves && [Quality] == Rare # ([strength] >= 6) + ([dexterity] >= 10) + ([IAS] >= 10) + ([EnhancedDefense] >= 60) + ([LifeLeech] >= 2) + ([ManaLeech] >= 2) + ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 4
+[Type] == Gloves && [Quality] == Rare # ([strength] >= 9) + ([dexterity] >= 15) + ([IAS] >= 10) + ([EnhancedDefense] >= 95) + ([LifeLeech] >= 3) + ([ManaLeech] >= 3) + ([coldresist] >= 28) + ([fireresist] >= 28) + ([lightresist] >= 28) >= 3
+[Type] == Gloves && [Name] != BattleGauntlets && [Name] != WarGauntlets && [Quality] == Rare # ([HPRegen] >= 3) + ([strength] >= 6) + ([dexterity] >= 10) + ([EnhancedDefense] >= 60) + ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 4
+[Type] == Gloves && [Name] != BattleGauntlets && [Name] != WarGauntlets && [Quality] == Rare # ([HPRegen] >= 5) + ([strength] >= 9) + ([dexterity] >= 15) + ([EnhancedDefense] >= 95) + ([coldresist] >= 28) + ([fireresist] >= 28) + ([lightresist] >= 28) >= 3
+
+//--- Caster Weapons ---
+[Type] == Scepter && [Quality] == Rare # [PaladinSkills]+[SkillBlessedHammer] >= 5 && ([SkillConcentration] >= 3 || ([FCR] >= 10 && [SkillConcentration] >= 2))
+[Type] == Staff && [Quality] == Rare # [SorceressSkills] >= 2 && [FCR] >= 20 && ([SkillEnchant] >= 3 || [SkillLightning] >= 3 || [SkillBlizzard] >= 3 || [SkillFireball] >= 3)
+[Type] == Wand && [Quality] == Rare # [NecromancerSkills] >= 2 && [FCR] >= 20 && [SkillBoneSpear] >= 3
+[Type] == Wand && [Quality] == Rare # [FCR] >= 20 && [fireresist]+[coldresist]+[lightresist] >= 40 && ([fireresist]+[coldresist]+[lightresist] >= 50) + ([fireresist]+[coldresist]+[lightresist] >= 60) + ([fireresist]+[coldresist]+[lightresist] >= 70) + ([fireresist]+[coldresist]+[lightresist] >= 80) + ([HPRegen] >= 3) + ([HPRegen] >= 5) + ([Mana] >= 25) + ([Mana] >= 45) + ([Mana] >= 50) + ([Energy] >= 6) + ([Energy] >= 11) + ([Energy] >= 15) >= 4
+
+//--- Phys Weapons ---
+([Type] == Mace || [type] == Club || [type] == Sword || [Type] == Axe || [Type] == Polearm || [Type] == Scepter) && [Class] == Exceptional && [Quality] == Rare # [EnhancedDamage] >= 160
+[Type] == Bow && [Class] == Exceptional && [Quality] == Rare # [EnhancedDamage] >= 160 && ([EnhancedDamage] >= 180 || [Dexterity] >= 10 || [IAS] >= 20 || [MinDamage] >= 10 || [MaxDamage] >= 10 || [Amazonskills] >= 2 || [itemreqpercent] >= 30)
+
+//--- Shields ---
+[Type] == Shield && [Quality] == Rare # [FBR] == 30 && ([PaladinSkills] >= 1)*1.5 + ([PaladinSkills] >= 2)*1.5 + ([itemreqpercent] >= 30) + ([MaxHP] >= 20) + ([MaxHP] >= 29) + ([MaxHP] >= 36) + ([FHR] >= 10) + ([FHR] >= 17) + ([EnhancedDefense] >= 60) + ([EnhancedDefense] >= 75) + ([EnhancedDefense] >= 90) + ([MaxDamage] >= 3) + ([strength] >= 5) + ([strength] >= 9) + ([itemdamagetomana] >= 10) + ([itempoisonlengthresist] >= 75) + ([fireresist]+[coldresist]+[lightresist] >= 30)*2 + ([fireresist]+[coldresist]+[lightresist] >= 40) + ([fireresist]+[coldresist]+[lightresist] >= 50) >= 9
+[Type] == Shield && [Quality] == Rare # [PaladinSkills] >= 2 && ([itemreqpercent] >= 30) + ([MaxHP] >= 20) + ([MaxHP] >= 29) + ([MaxHP] >= 36) + ([FHR] >= 10) + ([FHR] >= 17) + ([EnhancedDefense] >= 60) + ([EnhancedDefense] >= 75) + ([EnhancedDefense] >= 90) + ([MaxDamage] >= 3) + ([strength] >= 5) + ([strength] >= 9) + ([itemdamagetomana] >= 10) + ([itempoisonlengthresist] >= 75) + ([fireresist]+[coldresist]+[lightresist] >= 30)*2 + ([fireresist]+[coldresist]+[lightresist] >= 40) + ([fireresist]+[coldresist]+[lightresist] >= 50) >= 9
+
+//--- Rings ---
+[Type] == Ring && [Quality] == Rare # ([FCR] >= 10)*4 + ([strength]+[dexterity] >= 12) + ([strength]+[dexterity] >= 18) + ([strength]+[dexterity] >= 24) + ([strength]+[dexterity] >= 28) + ([MaxHP] >= 10) + ([MaxHP] >= 20) + ([MaxHP] >= 30) + ([MaxHP] >= 35) + ([Mana] >= 20) + ([Mana] >= 35) + ([Mana] >= 50) + ([HPRegen] >= 4) + ([HPRegen] >= 8) + ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) + ([fireresist]+[coldresist]+[lightresist] >= 40) >= 11
+[Type] == Ring && [Quality] == Rare # ([LifeLeech]+[ManaLeech] >= 4) + ([LifeLeech]+[ManaLeech] >= 7) + ([LifeLeech]+[ManaLeech] >= 10) + ([LifeLeech]+[ManaLeech] >= 12) + ([MaxDamage] >= 4)*2 + ([ToHit] >= 80) + ([ToHit] >= 105) + ([MinDamage] >= 5) + ([MinDamage] >= 9) + ([strength]+[dexterity] >= 12) + ([strength]+[dexterity] >= 18) + ([strength]+[dexterity] >= 24) + ([strength]+[dexterity] >= 28) + ([MaxHP] >= 10) + ([MaxHP] >= 20) + ([MaxHP] >= 30) + ([MaxHP] >= 35) + ([Mana] >= 20) + ([Mana] >= 35) + ([Mana] >= 50) + ([HPRegen] >= 4) + ([HPRegen] >= 8) + ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) + ([fireresist]+[coldresist]+[lightresist] >= 40) >= 11
+
+//--- Amulets ---
+[Type] == Amulet && [Quality] == Rare # ([ItemAddClassSkills] >= 1)*2 + ([ItemAddClassSkills] >= 2)*2 + ([FCR] >= 10)*4 + ([strength]+[dexterity] >= 14) + ([strength]+[dexterity] >= 20) + ([strength]+[dexterity] >= 26) + ([strength]+[dexterity] >= 33) + ([MaxHP] >= 20) + ([MaxHP] >= 30) + ([MaxHP] >= 40) + ([MaxHP] >= 50) + ([Mana] >= 20) + ([Mana] >= 35) + ([Mana] >= 50) + ([fireresist]+[coldresist]+[lightresist] >= 20) + ([fireresist]+[coldresist]+[lightresist] >= 30) + ([fireresist]+[coldresist]+[lightresist] >= 40) + ([fireresist]+[coldresist]+[lightresist] >= 50) >= 12
+
+//--- Armors ---
+[Type] == Armor && [Quality] == Rare # ([strength]+[dexterity] >= 8) + ([strength]+[dexterity] >= 14) + ([strength]+[dexterity] >= 19) + ([strength]+[dexterity] >= 22) + ([FHR] >= 10) + ([FHR] >= 17) + ([FHR] >= 24) + ([EnhancedDefense] >= 60) + ([EnhancedDefense] >= 75) + ([EnhancedDefense] >= 90) + ([MaxHP] >= 20) + ([MaxHP] >= 30) + ([MaxHP] >= 40) + ([MaxHP] >= 50) + ([itemreqpercent] >= 20) + ([itemreqpercent] >= 30) + ([lightresist] >= 19) + ([coldresist] >= 19) + ([fireresist] >= 19) + ([lightresist]+[coldresist]+[fireresist] >= 55) >= 8
+
+//--- Boots ---
+[Type] == Boots && [Quality] == Rare # [fireresist]+[coldresist]+[lightresist] >= 40 && ([FRW] >= 10) + ([FRW] >= 20) + ([FRW] >= 30) + ([FHR] >= 10)*2 + ([HPRegen] >= 3) + ([HPRegen] >= 5) + ([dexterity] >= 4) + ([dexterity] >= 8) + ([fireresist]+[coldresist]+[lightresist] >= 50) + ([fireresist]+[coldresist]+[lightresist] >= 60) + ([fireresist]+[coldresist]+[lightresist] >= 75) + ([fireresist]+[coldresist]+[lightresist] >= 90) >= 6
+
+//--- Belts ---
+[Type] == Belt && [Quality] == Rare # ([FHR] >= 10) + ([FHR] >= 17) + ([FHR] >= 24) + ([MaxHP] >= 20) + ([MaxHP] >= 35) + ([MaxHP] >= 50) + ([HPRegen] >= 4) + ([strength] >= 9) + ([strength] >= 14) + ([strength] >= 18) + ([fireresist]+[coldresist]+[lightresist] >= 29) + ([fireresist]+[coldresist]+[lightresist] >= 39) + ([fireresist]+[coldresist]+[lightresist] >= 49) + ([fireresist]+[coldresist]+[lightresist] >= 58) >= 8

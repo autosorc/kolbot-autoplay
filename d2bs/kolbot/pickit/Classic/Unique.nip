@@ -1,0 +1,65 @@
+//--- Unidentified ---
+
+//[Name] == FullPlateMail && [Quality] == Unique 	    						 					//Goldskin
+//[Name] == Mace && [Quality] == Unique											 					//Crushflange
+//[Name] == QuiltedArmor && [Quality] == Unique									 					//Greyform
+//[Name] == StuddedLeather && [Quality] == Unique								 					//Twitch
+//[Name] == AncientArmor && [Quality] == Unique									 					//Silks
+//[Name] == Cap &&  [Quality] == Unique											 					//Biggons
+//[Name] == SkullCap && [Quality] == Unique										 					//Tarn
+//[Name] == Mask && [Quality] == Unique											 					//Mask of Horror
+//[Name] == Boots && [Quality] == Unique										 					//Hotspur
+//[Name] == LightGauntlets && [Quality] == Unique 								 					//Magefist
+//[Name] == ChainGloves && [Quality] == Unique									 					//Chancies
+//[Name] == HeavyGloves && [Quality] == Unique									 					//Bloodfist
+//[Name] == LongBow && [Quality] == Unique										 					//Ravenclaw
+//[Name] == Blade && [Quality] == Unique											 					//Shard
+//[Name] == Dagger &&  [Quality] == Unique										 					//Gull
+//[Name] == BoneShield && [Quality] == Unique 									 					//Eyeless
+//[Name] == GothicShield && [Quality] == Unique									 					//Ward
+//[Name] == HeavyBelt && [Quality] == Unique 									 					//Goldwrap
+//[Name] == Belt && [Quality] == Unique 										 					//Nightsmoke
+//[Name] == Maul && [Quality] == Unique											 					//Bonesnap
+//[Name] == LightPlatedBoots && [Quality] == Unique								 					//Goblin Toe
+//[Name] == SpikedShield && [Quality] == Unique									 					//Swordback
+//[Name] == ScaleMail && [Quality] == Unique									 					//Hawkmail
+//[Name] == RingMail && [Quality] == Unique										 					//Darkglow
+//[Name] == LeatherArmor && [Quality] == Unique									 					//Blinkbat
+//[Name] == GothicPlate && [Quality] == Unique									 					//Rattlecage
+//[Name] == GreatHelm && [Quality] == Unique									 					//Howltusk
+
+//[Type] == Ring && [Quality] == Unique											 					//Ring
+//[Type] == Amulet && [Quality] == Unique										 					//Amulet
+
+
+//--- Identified ---
+
+[Name] == FullPlateMail && [Quality] == Unique # [EnhancedDefense] >= 150							//Perfect Goldskin
+//[Name] == Mace && [Quality] == Unique # [EnhancedDamage] >= 60									//Perfect Crushflange
+//[Name] == QuiltedArmor && [Quality] == Unique # [Defense] >= 31				 					//Perfect Greyform
+[Name] == StuddedLeather && [Quality] == Unique # [Defense] >= 60									//Perfect Twitch
+[Name] == AncientArmor && [Quality] == Unique # [EnhancedDefense] >= 120		 					//Perfect Silks
+[Name] == SkullCap && [Quality] == Unique	# [ItemMagicBonus] >= 50			 					//Perfect Tarn
+[Name] == Boots && [Quality] == Unique # [EnhancedDefense] >= 20			 	 					//Perfect Hot Spur
+[Name] == LightGauntlets && [Quality] == Unique # [EnhancedDefense] >= 30		 					//Perfect Magefist
+[Name] == ChainGloves && [Quality] == Unique # [ItemMagicBonus] >= 40 && [EnhancedDefense] >= 30 	//Perfect Chancies
+//[Name] == ChainGloves && [Quality] == Unique # [ItemMagicBonus] >= 40				 				//40MF Chancies
+[Name] == HeavyGloves && [Quality] == Unique # [EnhancedDefense] >= 20			 					//Perfect Bloodfist
+[Name] == LongBow && [Quality] == Unique # [EnhancedDamage] >= 70				 					//Perfect Ravenclaw
+[Name] == BoneShield && [Quality] == Unique # [EnhancedDefense] >= 40			 					//Perfect Eyeless
+[Name] == GothicShield && [Quality] == Unique # [FireResist] >= 50				 					//Perfect Ward
+[Name] == HeavyBelt && [Quality] == Unique # [EnhancedDefense] >= 60 && [ItemGoldBonus] >= 80		//Perfect Goldwrap
+//[Name] == HeavyBelt && [Quality] == Unique # [EnhancedDefense] >= 60								//60ED Goldwrap
+//[Name] == HeavyBelt && [Quality] == Unique # [ItemGoldBonus] >= 80								//80GF Goldwrap
+//[Name] == Belt && [Quality] == Unique # [EnhancedDefense] >= 50									//Perfect Nightsmoke
+[Name] == Maul && [Quality] == Unique # [EnhancedDamage] >= 300   			 						//Perfect Bonesnap
+[Name] == LightPlatedBoots && [Quality] == Unique # [EnhancedDefense] >= 60	 						//Perfect Goblin Toe
+//[Name] == SpikedShield && [Quality] == Unique # [EnhancedDefense] >= 60		 					//Perfect Swordback
+[Name] == ScaleMail && [Quality] == Unique # [EnhancedDefense] >= 100								//Perfect Hawkmail
+//[Name] == RingMail && [Quality] == Unique # [EnhancedDefense] >= 100		 						//Perfect Darkglow
+//[Name] == LeatherArmor && [Quality] == Unique # [Defense] >= 42				 					//Perfect Blinkbat
+[Name] == GothicPlate && [Quality] == Unique # [Defense] >= 335				 						//Perfect Rattlecage
+//[Type] == Amulet && [Quality] == Unique # [FireResist] >= 50					 					//Nokozan
+[Type] == Ring && [Quality] == Unique # [ItemMaxManaPercent] >= 25 				 					//Stone of Jordan
+[Type] == Ring && [Quality] == Unique # [ItemMagicBonus] >= 30 && [ToHit] >= 75						//Perfect Nagel
+//[Type] == Ring && [Quality] == Unique # [ItemMagicBonus] >= 30									//30MF Nagel

@@ -1,0 +1,3 @@
+// Test pickit lines
+
+[name] == shortstaff # [itemchargedskill] == 45 && [itemchargedskilllevel] == 1

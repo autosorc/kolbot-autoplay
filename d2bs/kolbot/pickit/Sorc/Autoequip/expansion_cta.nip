@@ -1,0 +1,1 @@
+[name] == crystalsword && [quality] <= superior && [flag] != ethereal # [Sockets] == 5 # [MaxQuantity] == 1

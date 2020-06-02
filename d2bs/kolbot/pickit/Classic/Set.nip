@@ -1,0 +1,94 @@
+//--- Angelic Raiment ---
+//[Name] == RingMail && [Quality] == Set 													//Angelic Mantle
+//[Name] == Sabre && [Quality] == Set 														//Angelic Sickle
+//[Type] == Ring && [Quality] == Set # [MaxHP] == 20 										//Angelic Halo
+//[Type] == Amulet && [Quality] == Set # [ItemLightRadius] == 3 && [ItemDamageToMana] == 20 //Angelic Wings
+
+//--- Arcanna's Tricks ---
+//[Type] == Amulet && [Quality] == Set # [MaxMana] == 15 									//Arcanna's Sign
+//[Name] == SkullCap && [Quality] == Set 													//Arcanna's Head
+//[Name] == LightPlate && [Quality] == Set 													//Arcanna's Flesh
+//[Name] == WarStaff && [Quality] == Set 													//Arcanna's Deathwand
+
+//--- Arctic Gear ---
+//[Name] == QuiltedArmor && [Quality] == Set 												//Arctic Furs
+//[Name] == LightBelt && [Quality] == Set 													//Arctic Binding
+//[Name] == LightGauntlets && [Quality] == Set # [MaxHP] == 20								//Arctic Mitts
+//[Name] == ShortWarBow && [Quality] == Set 												//Arctic Horn
+
+//--- Berseker's Arsenal ---
+//[Name] == Helm && [Quality] == Set 														//Berserker's Headgear
+//[Name] == SplintMail && [Quality] == Set 													//Berserker's Hauberk
+//[Name] == DoubleAxe && [Quality] == Set 													//Berserker's Hatchet
+
+//--- Cathan's Traps ---
+//[Type] == Ring && [Quality] == Set # [LifeLeech] == 6 && [NormalDamageReduction] == 2		//Cathan's Seal
+//[Type] == Amulet && [Quality] == Set # [FHR] == 10 && [LightMaxDam] == 5 					//Cathan's Sigil
+//[Name] == ChainMail && [Quality] == Set 													//Cathan's Mesh
+//[Name] == Mask && [Quality] == Set 														//Cathan's Visage
+
+//--- Civerb's Vestment ---
+//[Name] == GrandScepter && [Quality] == Set 												//Civerb's Cudgel
+//[Type] == Amulet && [Quality] == Set # [ManaRecovery] == 40 && [HPRegen] == 4 			//Civerb's Icon
+//[Name] == LargeShield && [Quality] == Set 												//Civerb's Ward
+
+//--- Cleglaw's Brace ---
+//[Name] == LongSword && [Quality] == Set 													//Cleglaw's Tooth
+//[Name] == ChainGloves && [Quality] == Set 												//Cleglaw's Pincers
+//[Name] == SmallShield && [Quality] == Set 												//Cleglaw's Claw
+
+//--- Death's Disguise ---
+//[Name] == WarSword && [Quality] == Set 													//Death's Touch
+//[Name] == LeatherGloves && [Quality] == Set 												//Death's Hand
+//[Name] == Sash && [Quality] == Set 														//Death's Guard
+
+//--- Hsaru's Defense ---
+//[Name] == Buckler && [Quality] == Set 													//Hsarus' Iron Fist
+//[Name] == Belt && [Quality] == Set									 					//Hsarus' Iron Stay
+//[Name] == ChainBoots && [Quality] == Set 													//Hsarus' Iron Heel
+
+//--- Infernal Tools ---
+//[Name] == Cap && [Quality] == Set															//Infernal Cranium
+//[Name] == GrimWand && [Quality] == Set 													//Infernal Touch
+//[Name] == HeavyBelt && [Quality] == Set # [MaxHP] == 20							 		//Infernal Sign
+
+//--- Iratha's Finery ---
+[Name] == HeavyBelt && [Quality] == Set # [MinDamage] == 5 									//Iratha's Cord
+//[Name] == Crown && [Quality] == Set # [FireResist] == 30 && [Defense] >= 45 	 			//Perfect Iratha's Coil
+[Name] == Crown && [Quality] == Set # [FireResist] == 30									//Iratha's Coil
+[Type] == Amulet && [Quality] == Set # [PoisonResist] == 30 && [PoisonLength] == -75 		//Iratha's Collar
+//[Name] == LightGauntlets && [Quality] == Set # [ColdResist] == 30 && [Defense] >= 11		//Perfect Iratha's Cuff
+[Name] == LightGauntlets && [Quality] == Set # [ColdResist] == 30 						//Iratha's Cuff
+
+//--- Isenhart's Armory ---
+//[Name] == BroadSword && [Quality] == Set 													//Isenhart's Lightbrand
+//[Name] == FullHelm && [Quality] == Set 													//Isenhart's Horns
+//[Name] == BreastPlate && [Quality] == Set 												//Isenhart's Case
+//[Name] == GothicShield && [Quality] == Set 												//Isenhart's Parry
+
+//--- Milabrega's Regalia ---
+//[Name] == KiteShield && [Quality] == Set 													//Milabrega's Orb
+//[Name] == AncientArmor && [Quality] == Set 												//Milabrega's Robe
+//[Name] == WarScepter && [Quality] == Set 													//Milabrega's Rod
+//[Name] == Crown && [Quality] == Set # [MaxHP] == 15 && [MaxMana] == 15 					//Milabrega's Diadem
+
+//--- Sigon's Steel ---
+//[Name] == GreatHelm && [Quality] == Set 													//Sigon's Visor
+//[Name] == GothicPlate && [Quality] == Set 												//Sigon's Shelter
+//[Name] == Greaves && [Quality] == Set 													//Sigon's Sabot
+//[Name] == TowerShield && [Quality] == Set 												//Sigon's Guard
+//[Name] == PlatedBelt && [Quality] == Set 													//Sigon's Warp
+//[Name] == Gauntlets && [Quality] == Set 													//Sigon's Gage
+
+//--- Tancred's Battlegear ---
+//[Name] == BoneHelm && [Quality] == Set 													//Tancred's Skull
+//[Name] == FullPlateMail && [Quality] == Set 												//Tancred's Spine
+//[Name] == Boots && [Quality] == Set													 	//Tancred's Hobnails
+//[Name] == MilitaryPick && [Quality] == Set 												//Tancred's Crowbill
+//[Type] == Amulet && [Quality] == Set # [MagicDamageReduction] == 1 && [NormalDamageReduction] == 2 //Tancred's Weird
+
+//--- Vidala's Rig ---
+//[Type] == Amulet && [Quality] == Set # [ColdResist] == 20 && [MaxMana] == 15 				//Vidala's Snare
+//[Name] == LongBattleBow && [Quality] == Set 												//Vidala's Barb
+//[Name] == LeatherArmor && [Quality] == Set 												//Vidala's Ambush
+//[Name] == LightPlatedBoots && [Quality] == Set 											//Vidala's Fetlock
